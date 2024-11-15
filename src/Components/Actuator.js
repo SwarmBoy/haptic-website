@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { PlaneContext } from '../App'; // Adjust the import path as needed
+import { all } from 'three/webgpu';
 
 const Actuator = (props, ref) => {
   const { position, adresse, channel } = props;
@@ -46,7 +47,20 @@ const Actuator = (props, ref) => {
       setStatus('clicked');
     }
 
+
   };
+
+  const addToAllActuators = () => {
+    const allActuators = planeData.allActuators;
+    //check if the actuator is already in the list
+    if (!allActuators.includes(meshRef.current)) {
+      allActuators.push(meshRef.current);
+      planeData.setAllActuators(allActuators);
+    }else{
+      console.log('Actuator already in the list');
+    }
+  };
+
 
   useEffect(() => {
     if (status === 'active') {
@@ -78,14 +92,14 @@ const Actuator = (props, ref) => {
         materialRef.current.color.set('pink');
       }
     }
+
+    addToAllActuators();
   }, [status]);
 
   useEffect(() => {
     if (planeData.isPlaneMoving) {
       setStatus('idle');
     }
-
-    //store the reference of the actuator
     
   }, [planeData.isPlaneMoving]);
 
@@ -94,6 +108,8 @@ const Actuator = (props, ref) => {
     if (meshRef.current) {
       meshRef.current.userData.setStatus = setStatus;
       meshRef.current.userData.getStatus = () => status;
+      meshRef.current.userData.getAdresse = () => adresse;
+      meshRef.current.userData.getChannel = () => channel;
     }
   }, [status]);
   // Expose setStatus method to parent components

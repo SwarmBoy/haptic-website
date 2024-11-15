@@ -1,5 +1,5 @@
 // src/components/CombinedChart.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -11,7 +11,6 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-import { time } from 'three/webgpu';
 
 ChartJS.register(
   CategoryScale,
@@ -24,51 +23,51 @@ ChartJS.register(
 );
 
 function CombinedChart({ amplitudeData, frequencyData }) {
-  const timeLabelsAmplitude = amplitudeData.map((point) => point.time);
-  const timeLabelsFrequency = frequencyData.map((point) => point.time);
+  const [chartData, setChartData] = useState(() => {
+    const timeLabelsAmplitude = amplitudeData.map((point) => point.time);
+    const timeLabelsFrequency = frequencyData.map((point) => point.time);
 
-  // Map amplitude and frequency data to the time labels
-  const amplitudeValues = timeLabelsAmplitude.map((time) => {
-    const point = amplitudeData.find((p) => p.time === time);
-    return point ? point.amplitude : null;
+    const amplitudeValues = timeLabelsAmplitude.map((time) => {
+      const point = amplitudeData.find((p) => p.time === time);
+      return point ? point.amplitude : null;
+    });
+
+    const frequencyValues = timeLabelsFrequency.map((time) => {
+      const point = frequencyData.find((p) => p.time === time);
+      return point ? point.frequency : null;
+    });
+
+    amplitudeValues.pop();
+    timeLabelsAmplitude.pop();
+
+    const timeLabels = Array.from(new Set([...timeLabelsAmplitude, ...timeLabelsFrequency]));
+
+    return {
+      labels: timeLabels,
+      datasets: [
+        {
+          label: 'Amplitude',
+          data: amplitudeValues,
+          yAxisID: 'y1',
+          borderColor: 'rgba(0, 0, 255, 0.5)',
+          backgroundColor: 'rgba(0, 0, 255, 0.1)',
+          fill: false,
+          pointRadius: 0,
+          tension: 0.1,
+        },
+        {
+          label: 'Frequency',
+          data: frequencyValues,
+          yAxisID: 'y2',
+          borderColor: 'rgba(255, 0, 0, 0.5)',
+          backgroundColor: 'rgba(255, 0, 0, 0.1)',
+          fill: false,
+          pointRadius: 0,
+          tension: 0.1,
+        },
+      ],
+    };
   });
-
-  const frequencyValues = timeLabelsFrequency.map((time) => {
-    const point = frequencyData.find((p) => p.time === time);
-    return point ? point.frequency : null;
-  });
-
-  //remove the last ellement of amplitudeValues and add another one with +0.1
-  amplitudeValues.pop();
-  timeLabelsAmplitude.pop();
-
-  // Combine the time labels
-  const timeLabels = Array.from(new Set([...timeLabelsAmplitude, ...timeLabelsFrequency]));
-  const chartData = {
-    labels: timeLabels,
-    datasets: [
-      {
-        label: 'Amplitude',
-        data: amplitudeValues,
-        yAxisID: 'y1',
-        borderColor: 'rgba(0, 0, 255, 0.5)', // Transparent blue
-        backgroundColor: 'rgba(0, 0, 255, 0.1)',
-        fill: false,
-        pointRadius: 0,
-        tension: 0.1,
-      },
-      {
-        label: 'Frequency',
-        data: frequencyValues,
-        yAxisID: 'y2',
-        borderColor: 'rgba(255, 0, 0, 0.5)', // Transparent red
-        backgroundColor: 'rgba(255, 0, 0, 0.1)',
-        fill: false,
-        pointRadius: 0,
-        tension: 0.1,
-      },
-    ],
-  };
 
   const options = {
     responsive: true,
@@ -94,10 +93,10 @@ function CombinedChart({ amplitudeData, frequencyData }) {
           text: 'Time (s)',
         },
         ticks: {
-          callback: function(value, index, values) {
+          callback: function (value) {
             return value.toFixed(3);
-          }
-        }
+          },
+        },
       },
       y1: {
         type: 'linear',
@@ -119,7 +118,7 @@ function CombinedChart({ amplitudeData, frequencyData }) {
           text: 'Frequency',
         },
         grid: {
-          drawOnChartArea: false, // Only want the grid lines for one axis
+          drawOnChartArea: false,
         },
         min: 0,
         max: 1,
@@ -127,6 +126,7 @@ function CombinedChart({ amplitudeData, frequencyData }) {
     },
   };
 
+ 
   return (
     <div>
       <h2>Amplitude and Frequency Envelopes</h2>

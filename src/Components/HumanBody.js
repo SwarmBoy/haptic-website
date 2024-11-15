@@ -167,13 +167,6 @@ function HumanBody({setActuator}) {
       }
     }
 
-    //push the ref of all ther actuators
-    setActuattorsParent([torsoRef, rightArmRef, leftArmRef, neckRef, headRef]);
-    
-
-
-
-
   }, [bodyPartToActivate]);
 
 

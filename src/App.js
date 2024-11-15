@@ -21,6 +21,7 @@ export const PlaneContext = createContext({
   bodyPartToActivate: null,
   launchModel: async (adresse) => {}, 
   allActuators: [],
+  setAllActuators: () => {},
 });
 
 function App() {
@@ -58,9 +59,17 @@ function App() {
     }
   };
 
+  const handleFileSupress = () => {
+    console.log('Suppressing data appp');
+    setAmplitudeData(null);
+    setFrequencyData(null);
+  }
+
   useEffect(() => {
     if (amplitudeData && frequencyData) {
       setShowCombinedChart(true);
+    } else {
+      setShowCombinedChart(false);
     }
   }, [amplitudeData, frequencyData]);
 
@@ -72,12 +81,12 @@ function App() {
 
 
   return (
-    <PlaneContext.Provider value={{ planeData, isPlaneMoving, bodyPartToActivate, launchModel, allActuators }}>
+    <PlaneContext.Provider value={{ planeData, isPlaneMoving, bodyPartToActivate, launchModel, allActuators,setAllActuators }}>
       <div style={{ padding: '20px' , height: '80vh', display: 'flex', flexDirection: 'column' }}>
         <div className='control' style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', margin: '20px' }}>
           <div style={{ justifyContent: 'center', alignItems: 'center', marginRight: '50px' }}>
             <h1>Haptic File Viewer</h1>
-            <FileUploader onFileLoaded={handleFileLoaded} />
+            <FileUploader onFileLoaded={handleFileLoaded} onFileSupress={handleFileSupress} />
             {showCombinedChart && (
               <CombinedChart
                 amplitudeData={amplitudeData}

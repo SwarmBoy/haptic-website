@@ -20,7 +20,7 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
     }
     setLaunchModel(() => launchModel); // Set the launchModel function
 
-    socket.current = new WebSocket('ws://localhost:9051');
+    socket.current = new WebSocket('ws://localhost:9052');
 
     socket.current.onopen = () => {
       console.log('WebSocket connection established');
@@ -71,14 +71,17 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
     sendCommand(adresse, 0, 0, 0);
 };  
 
-
-  const launchModel = async () => {
+  const launchModel = async (adress=null) => {
     // Example: Send the data via WebSocket
     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
       if(amplitudeData && frequencyData){
           await launchModelCommande(addr);
       }else{
-        sendCommand(addr, 1, duty, freq);
+        if(adress != null){
+          sendCommand(adress, 1, duty, freq);
+        }else{
+          sendCommand(addr, 1, duty, freq);
+        }
       }
     }
   };
@@ -99,22 +102,31 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
     }
     };
 
-  const testHaptics = () => {
-    planeData.allActuators.forEach((parent) => {
-      console.log(parent.curren.children);
-      parent.current.children.forEach((actuator) => {
-
-        console.log(actuator.current);
-      });
+  const testHaptics = async () => {
+    planeData.allActuators.forEach(async (actuator) => {
+      try {
+        if(actuator.userData.getStatus() == 'clicked'){
+          if(actuator.userData.getAdresse() != null){
+            console.log('Sending command to server:', actuator.userData.getAdresse());
+            await launchModel(actuator.userData.getAdresse());
+          }
+        }
+      } catch (error) {
+        console.error('Error setting actuator status:', error);
+      }
     });
   };
+  
+  
   return (
     <div>
-      <h2> Test haptics </h2>
+      <h2> Selected Actuators </h2>
       <button onClick={() => testHaptics()}>Launch on selected</button>
+
+      
+      <h2> Commande </h2>
       <button onClick={() => launchModel()}>Send Command</button>
-      <button onClick={() => stopAllCommand()}>Stop All Command</button>
-      <div>
+      <button onClick={() => stopAllCommand()}>Stop All Command</button><div>
         <label>Address:</label>
         <input
           type="range"
