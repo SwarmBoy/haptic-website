@@ -1,8 +1,6 @@
 module.exports = {
-  // ...existing code...
   module: {
     rules: [
-      // ...existing rules...
       {
         test: /\.mjs$/,
         enforce: 'pre',
@@ -13,5 +11,4 @@ module.exports = {
       },
     ],
   },
-  // ...existing code...
 };

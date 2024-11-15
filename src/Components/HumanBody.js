@@ -2,13 +2,13 @@ import React, { useContext, useEffect, useRef, forwardRef } from 'react';
 import BodyPart from './BodyPart';
 import Actuator from './Actuator';
 import { Sphere } from '@react-three/drei';
-import gsap from 'gsap';
 import { PlaneContext } from '../App'; // Added import
 
 const Torso = forwardRef((props, ref) => {
+  const actuatorRefs = useRef([]);
   const actuators = [
     // Front Torso Actuators (Positions relative to the Torso)
-    { id: 1, position: [0, -0.2, 0.2] },
+    { id: 1, position: [0, -0.2, 0.2], adresse: 0, channel : 0 },
     { id: 2, position: [0.25, -0.3, 0.2] },
     { id: 3, position: [-0.25, -0.3, 0.2] },
     { id: 4, position: [0.2, 0.1, 0.2] },
@@ -25,16 +25,17 @@ const Torso = forwardRef((props, ref) => {
 
   return (
     <BodyPart ref={ref} position={[0, 0, 0]} args={[0.7, 1.5, 0.4]} color="lightblue">
-      {actuators.map((actuator) => (
-        <Actuator key={actuator.id} position={actuator.position} />
-      ))}
+      {actuators.map((actuator, index) => (
+        <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
+        ))}
     </BodyPart>
   );
 });
 
 const RightArm = forwardRef((props, ref) => {
+  const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 21, position: [0.1, 0.4, 0] },
+    { id: 21, position: [0.1, 0.4, 0], adresse: 2, channel : 0  },
     { id: 22, position: [0.1, 0, 0] },
     { id: 23, position: [0.1, -0.4, 0] },
   ];
@@ -47,16 +48,18 @@ const RightArm = forwardRef((props, ref) => {
       color="lightcoral"
       rotation={[0, 0, 0.50]} // 10 degrees in radians
     >
-      {actuators.map((actuator) => (
-        <Actuator key={actuator.id} position={actuator.position} />
+      {actuators.map((actuator, index) => (
+        <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
       ))}
+
     </BodyPart>
   );
 });
 
 const LeftArm = forwardRef((props, ref) => {
+  const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 31, position: [-0.1, 0.4, 0] },
+    { id: 31, position: [-0.1, 0.4, 0], adresse: 3, channel : 0  },
     { id: 32, position: [-0.1, 0, 0] },
     { id: 33, position: [-0.1, -0.4, 0] },
   ];
@@ -68,32 +71,34 @@ const LeftArm = forwardRef((props, ref) => {
       color="lightcoral"
       rotation={[0, 0, -0.5]} // -10 degrees in radians
     >
-      {actuators.map((actuator) => (
-        <Actuator key={actuator.id} position={actuator.position} />
-      ))}
+      {actuators.map((actuator, index) => (
+        <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
+        ))}
     </BodyPart>
   );
 });
 
 const Neck = forwardRef((props, ref) => {
+  const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 41, position: [0, 0, -0.2] },
+    { id: 41, position: [0, 0, -0.2]},
     { id: 42, position: [0.1, 0, -0.25] },
     { id: 43, position: [-0.1, 0, -0.25] },
   ];
 
   return (
     <BodyPart ref={ref} position={[0, 0.7, 0]} args={[0.2, 0.3, 0.2]} color="lightgreen">
-      {actuators.map((actuator) => (
-        <Actuator key={actuator.id} position={actuator.position} />
-      ))}
+      {actuators.map((actuator, index) => (
+        <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
+        ))}
     </BodyPart>
   );
 });
 
 const Head = forwardRef((props, ref) => {
+  const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 51, position: [0, 0.3, 0] },
+    { id: 51, position: [0, 0.3, 0], adresse: 4, channel : 0},
     { id: 52, position: [0.2, 0.25, 0.1] },
     { id: 53, position: [-0.2, 0.25, 0.1] },
   ];
@@ -101,15 +106,16 @@ const Head = forwardRef((props, ref) => {
   return (
     <Sphere ref={ref} position={[0, 1, 0]} args={[0.3, 16, 16]}>
       <meshStandardMaterial attach="material" color="lightgreen" />
-      {actuators.map((actuator) => (
-        <Actuator key={actuator.id} position={actuator.position} />
-      ))}
+      {actuators.map((actuator, index) => (
+        <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
+        ))}
     </Sphere>
   );
 });
 
-function HumanBody() {
-  const { bodyPartToActivate, resetBodyPart } = useContext(PlaneContext);
+function HumanBody({setActuator}) {
+  const setActuattorsParent = setActuator;
+  const { bodyPartToActivate } = useContext(PlaneContext);
   const torsoRef = useRef();
   const rightArmRef = useRef();
   const leftArmRef = useRef();
@@ -127,9 +133,6 @@ function HumanBody() {
           }
         });
       });
-
-
-
 
       let targetRef;
 
@@ -163,7 +166,17 @@ function HumanBody() {
         });      
       }
     }
+
+    //push the ref of all ther actuators
+    setActuattorsParent([torsoRef, rightArmRef, leftArmRef, neckRef, headRef]);
+    
+
+
+
+
   }, [bodyPartToActivate]);
+
+
 
   return (
     <group>

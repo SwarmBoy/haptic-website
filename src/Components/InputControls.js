@@ -70,11 +70,21 @@ function InputControls({
         </p>
       </div>
       <div style={{ padding: '10px' }}>
-        <button onClick={() => triggerBodyPartAnimation('torso')}>Activate Torso</button>
-        <button onClick={() => triggerBodyPartAnimation('rightArm')}>Activate Right Arm</button>
-        <button onClick={() => triggerBodyPartAnimation('leftArm')}>Activate Left Arm</button>
-        <button onClick={() => triggerBodyPartAnimation('neck')}>Activate Neck</button>
-        <button onClick={() => triggerBodyPartAnimation('head')}>Activate Head</button>
+        <table>
+          <tbody>
+            <tr>
+              <td><button onClick={() => triggerBodyPartAnimation('torso')}>Activate Torso</button></td>
+              <td><button onClick={() => triggerBodyPartAnimation('rightArm')}>Activate Right Arm</button></td>
+            </tr>
+            <tr>
+              <td><button onClick={(  ) => triggerBodyPartAnimation('leftArm')}>Activate Left Arm</button></td>
+              <td><button onClick={() => triggerBodyPartAnimation('neck')}>Activate Neck</button></td>
+            </tr>
+            <tr>
+              <td colSpan="2"><button onClick={() => triggerBodyPartAnimation('head')}>Activate Head</button></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

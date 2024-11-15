@@ -7,8 +7,8 @@ import { gsap } from 'gsap';
 import { PlaneContext } from '../App'; // Adjust the import path as needed
 
 const Actuator = (props, ref) => {
-  const { position } = props;
-  const ANIMATION_DURATION = 1;
+  const { position, adresse, channel } = props;
+  const ANIMATION_DURATION = 0.35;
   const [status, setStatus] = useState('idle');
   const materialRef = useRef();
   const meshRef = useRef();
@@ -31,8 +31,12 @@ const Actuator = (props, ref) => {
 
       // If the distance is less than or equal to the actuator's radius, they intersect
       const radius = 0.05; // Actuator sphere radius
-      if (Math.abs(distance) <= radius) {
+      if (Math.abs(distance) <= radius && status === 'idle') {  
         setStatus('active');
+            // Call the launchModel function from HapticsTest
+        if (planeData.launchModel) {
+          planeData.launchModel(adresse);
+        }
       }
     }
   });
@@ -41,6 +45,7 @@ const Actuator = (props, ref) => {
     if (status !== 'clicked') {
       setStatus('clicked');
     }
+
   };
 
   useEffect(() => {
@@ -67,6 +72,11 @@ const Actuator = (props, ref) => {
     } else if (status === 'idle') {
       // Reset color to grey
       materialRef.current.color.set('grey');
+      if (adresse!=null && channel!=null) {
+        console.log('Sending command to server:', adresse, channel);
+        // Send the command to the server
+        materialRef.current.color.set('pink');
+      }
     }
   }, [status]);
 
@@ -74,14 +84,18 @@ const Actuator = (props, ref) => {
     if (planeData.isPlaneMoving) {
       setStatus('idle');
     }
+
+    //store the reference of the actuator
+    
   }, [planeData.isPlaneMoving]);
+
 
   useEffect(() => {
     if (meshRef.current) {
       meshRef.current.userData.setStatus = setStatus;
       meshRef.current.userData.getStatus = () => status;
     }
-  }, []);
+  }, [status]);
   // Expose setStatus method to parent components
   React.useImperativeHandle(ref, () => ({
     setStatus: (newStatus) => setStatus(newStatus),
