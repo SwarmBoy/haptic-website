@@ -1,0 +1,40 @@
+in /unitplotter  in port 3006
+
+sh start.sh 
+
+
+open new terminal for haptic in port 3000
+in /haptic-merbsite
+
+npm start
+
+
+open unity demo : SoundMappiungUnity
+
+
+
+
+Plot your own variable:
+1) Make DataEntry function like bellow 
+ DataEntry getAverageCohesion()
+    {
+        Vector3 averageCohesion = Vector3.zero;
+        int numDrones = 0;
+
+        foreach (Transform drone in swarmHolder.transform)
+        {
+            averageCohesion += drone.GetComponent<DroneController>().cohesionForce;
+            numDrones++;
+        }
+
+        if (numDrones > 0)
+        {
+            averageCohesion /= numDrones;
+        }
+
+        return new DataEntry("averageCohesion", averageCohesion.magnitude.ToString(), fullHistory: true);
+    }
+
+
+    2) Setup Callback
+    this.GetComponent<sendInfoGameObject>().setupCallback(getAverageCohesion);

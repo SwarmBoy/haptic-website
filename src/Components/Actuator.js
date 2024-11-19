@@ -1,11 +1,12 @@
-// Actuator.js
-import { Sphere } from '@react-three/drei';
+import { Sphere, Html } from '@react-three/drei';
 import React, { useState, useEffect, useRef, useContext, forwardRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
-import { PlaneContext } from '../App'; // Adjust the import path as needed
-import { all } from 'three/webgpu';
+import { PlaneContext } from '../App';
+import ActuatorPlot from './ActuatorPlot'; // Import the plot component
+import { deltaTime, pass } from 'three/webgpu';
+
 
 const Actuator = (props, ref) => {
   const { position, adresse, channel } = props;
@@ -14,6 +15,8 @@ const Actuator = (props, ref) => {
   const materialRef = useRef();
   const meshRef = useRef();
   const planeData = useContext(PlaneContext);
+  const [actuatorData, setActuatorData] = useState([]);
+  const { camera } = useThree(); // Access the camera
 
   useFrame(() => {
     if (planeData && meshRef.current) {
@@ -35,6 +38,9 @@ const Actuator = (props, ref) => {
       if (Math.abs(distance) <= radius && status === 'idle') {  
         setStatus('active');
             // Call the launchModel function from HapticsTest
+        if  (adresse == null || channel == null) {
+          return;
+        }
         if (planeData.launchModel) {
           planeData.launchModel(adresse);
         }
@@ -42,9 +48,30 @@ const Actuator = (props, ref) => {
     }
   });
 
+  useEffect(() => {
+    if (planeData && planeData.dataActuators && planeData.dataActuators.commands) {
+      const data = planeData.dataActuators.commands.filter(cmd => cmd.addr === adresse);
+      // add a point for the current time  Date.now()/1000  `
+
+
+      setActuatorData(data);
+    }
+  }, [planeData.dataActuators]);
+
   const handleClick = () => {
     if (status !== 'clicked') {
       setStatus('clicked');
+      console.log(actuatorData);
+      if(adresse!=null && channel!=null){
+        planeData.addRemoveActuator(adresse, true);
+      }
+    }
+
+    if (status === 'clicked') {
+      setStatus('idle');
+      if(adresse!=null && channel!=null){
+        planeData.addRemoveActuator(adresse, false);
+      }
     }
 
 
@@ -103,6 +130,23 @@ const Actuator = (props, ref) => {
     
   }, [planeData.isPlaneMoving]);
 
+  const calculateOffsetPosition = () => {
+    if (meshRef.current) {
+      const actuatorWorldPosition = new THREE.Vector3();
+      meshRef.current.getWorldPosition(actuatorWorldPosition);
+
+      const directionToCamera = new THREE.Vector3();
+      directionToCamera.subVectors(camera.position, actuatorWorldPosition).normalize();
+
+      const offsetDistance = 0.1; // Adjust this value as needed
+      const offsetPosition = new THREE.Vector3();
+      offsetPosition.copy(actuatorWorldPosition).addScaledVector(directionToCamera, offsetDistance);
+
+      return offsetPosition;
+    }
+    return [0, 0, 0];
+  };
+
 
   useEffect(() => {
     if (meshRef.current) {
@@ -119,11 +163,34 @@ const Actuator = (props, ref) => {
 
   return (
     <mesh ref={meshRef} position={position} onClick={handleClick}>
-      <Sphere args={[0.05, 16, 16]}>
-        <meshStandardMaterial ref={materialRef} color="grey" />
-      </Sphere>
-    </mesh>
+    <Sphere args={[0.05, 16, 16]}>
+      <meshStandardMaterial ref={materialRef} color="grey" />
+    </Sphere>
+    {status === 'clicked'  && (
+      <Html
+        position={calculateOffsetPosition()}
+        transform
+        occlude
+        sprite
+        style={{ pointerEvents: 'none' }}
+      >
+        <div
+          style={{
+            width: '200px',
+            height: '75px',
+            backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent background
+            padding: '5px',
+            borderRadius: '5px',
+            pointerEvents: 'auto',
+            
+          }}
+        >
+          <ActuatorPlot data={actuatorData} />
+        </div>
+      </Html>
+    )}
+  </mesh>
   );
 }
 
-export default forwardRef(Actuator); // Ensure forwardRef wraps the Actuator correctly
+export default forwardRef(Actuator); 

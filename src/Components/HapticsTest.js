@@ -4,7 +4,7 @@ import { PlaneContext } from '../App'; // Adjust the import path as needed
 import { all } from 'three/webgpu';
 
 function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuators }) {
-  const REFRESH_RATE = 100; // ms
+  const REFRESH_RATE = 30; // ms
   const planeData = useContext(PlaneContext);
 
 
@@ -52,35 +52,44 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
             //so the data do not have at all the same time so find the closest superior and inferior time
             let amplitudeIndex = amplitudeData.findIndex((point) => point.time * 1000 >= time);
             let frequencyIndex = frequencyData.findIndex((point) => point.time * 1000 >= time);
-            if (amplitudeIndex === -1 || frequencyIndex === -1 || amplitudeIndex == amplitudeData.length - 1 || frequencyIndex == frequencyData.length - 1) {
-                sendCommand(adresse, 0, 0, 0);
-            }
-            else
-            {
-                let frequency = frequencyData[frequencyIndex].frequency;
-                frequency = Math.round(frequency * 9) + 1; // Map frequency from 0-1 to 1-10
 
-                let amplitude = amplitudeData[amplitudeIndex].amplitude;
+
+            let frequency = 0;
+            let amplitude = 0;
+            if(amplitudeIndex != -1 && amplitudeIndex < amplitudeData.length-1){
+                amplitude = amplitudeData[amplitudeIndex].amplitude;
                 amplitude = Math.round(amplitude * 9) + 1; // Map amplitude from 0-1 to 1-10
-                sendCommand(adresse, 1, amplitude, frequency);
             }
+            if(frequencyIndex != -1 && frequencyIndex < frequencyData.length-1){
+                frequency = frequencyData[frequencyIndex].frequency;
+                frequency = Math.round(frequency * 9) + 1; // Map frequency from 0-1 to 1-10
+            }
+
+            console.log('Sending command to server:', adresse, amplitude, frequency, amplitudeIndex, frequencyIndex);
+            sendCommand(adresse, 1, amplitude, frequency);
             await new Promise((resolve) => setTimeout(resolve, REFRESH_RATE));
         }
     }
-
+    await new Promise((resolve) => setTimeout(resolve, REFRESH_RATE));
     sendCommand(adresse, 0, 0, 0);
-};  
+};
+
+  const launchOnAndOff = async (adresse, mode, duty, freq) => {
+    sendCommand(adresse, mode, duty, freq);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    sendCommand(adresse, 0, 0, 0);
+  };
 
   const launchModel = async (adress=null) => {
     // Example: Send the data via WebSocket
     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
       if(amplitudeData && frequencyData){
-          await launchModelCommande(addr);
+          await launchModelCommande(adress);
       }else{
         if(adress != null){
-          sendCommand(adress, 1, duty, freq);
+          launchOnAndOff(adress, 1, duty, freq); // launch by the send commande
         }else{
-          sendCommand(addr, 1, duty, freq);
+          launchOnAndOff(addr, 1, duty, freq); // Launch with then plan animation of animation per axctuator
         }
       }
     }

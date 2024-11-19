@@ -22,6 +22,9 @@ export const PlaneContext = createContext({
   launchModel: async (adresse) => {}, 
   allActuators: [],
   setAllActuators: () => {},
+  addRemoveActuator: (adress, add) => {},
+  dataActuators: [],
+
 });
 
 function App() {
@@ -32,22 +35,48 @@ function App() {
   const [isTestHaptics, setIsTestHaptics] = useState(false);
   const [launchModel, setLaunchModel] = useState(null); 
   const [allActuators, setAllActuators] = useState([]);
-
+  const [actuatorsSelected, setActuatorsSelected] = useState([]);
+  const [dataActuators, setDataActuators] = useState([]);
   const [planeData, setPlaneData] = useState({
     position: [0, 0, 0],
     normal: [0, 1, 0],
   });
-
   const [bodyPartToActivate, setBodyPartToActivate] = useState(null);
   const [points, setPoints] = useState([]); // Store points at intersections
-
   const [amplitudeData, setAmplitudeData] = useState(null);
   const [frequencyData, setFrequencyData] = useState(null);
   const [showCombinedChart, setShowCombinedChart] = useState(false);
 
   useEffect(() => {
-    console.log(allActuators);
-  }, [allActuators]);
+    // Fetch and process data periodically
+    const fetchData = () => {
+      fetch('http://localhost:5000/getCommands')
+        .then((response) => response.json())
+        .then((fetchedData) => {
+          setDataActuators(fetchedData);
+        })
+        .catch((error) => console.error('Error fetching data:', error));
+    };
+
+    const intervalId = setInterval(fetchData, 1000);
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, []);
+
+
+  const addRemoveActuator = (adress, add) => {
+    if (add) {
+      if (!actuatorsSelected.includes(adress)) {
+        setActuatorsSelected([...actuatorsSelected, adress]);
+      }
+    }
+    else {
+      setActuatorsSelected(actuatorsSelected.filter((actuator) => actuator !== adress));
+    }
+  };
+
+  useEffect(() => {
+    console.log(actuatorsSelected);
+  }, [actuatorsSelected]);
 
   const handleFileLoaded = (jsonData) => {
     try {
@@ -78,10 +107,8 @@ function App() {
     setBodyPartToActivate(bodyPart);
   };
 
-
-
   return (
-    <PlaneContext.Provider value={{ planeData, isPlaneMoving, bodyPartToActivate, launchModel, allActuators,setAllActuators }}>
+    <PlaneContext.Provider value={{ planeData, isPlaneMoving, bodyPartToActivate, launchModel, allActuators, setAllActuators, addRemoveActuator, dataActuators }}>
       <div style={{ padding: '20px' , height: '80vh', display: 'flex', flexDirection: 'column' }}>
         <div className='control' style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', margin: '20px' }}>
           <div style={{ justifyContent: 'center', alignItems: 'center', marginRight: '50px' }}>
