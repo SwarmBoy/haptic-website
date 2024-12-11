@@ -4,14 +4,14 @@ import { PlaneContext } from '../App'; // Adjust the import path as needed
 import { all } from 'three/webgpu';
 
 function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuators }) {
-  const REFRESH_RATE = 30; // ms
+  const REFRESH_RATE = 10; // ms
   const planeData = useContext(PlaneContext);
 
 
   const socket = useRef(null);
   const [addr, setAddr] = useState(0);
-  const [duty, setDuty] = useState(1);
-  const [freq, setFreq] = useState(0);
+  const [duty, setDuty] = useState(8);
+  const [freq, setFreq] = useState(2);
 
   useEffect(() => {
 
@@ -65,7 +65,7 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
                 frequency = Math.round(frequency * 9) + 1; // Map frequency from 0-1 to 1-10
             }
 
-            console.log('Sending command to server:', adresse, amplitude, frequency, amplitudeIndex, frequencyIndex);
+          //  console.log('Sending command to server:', adresse, amplitude, frequency, amplitudeIndex, frequencyIndex);
             sendCommand(adresse, 1, amplitude, frequency);
             await new Promise((resolve) => setTimeout(resolve, REFRESH_RATE));
         }
@@ -97,7 +97,7 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
 
   const sendCommand = (addr, mode, duty, freq) => {
     const command = JSON.stringify({ addr, mode, duty, freq });
-    console.log('Sending command:', command);
+ //   console.log('Sending command:', command);
     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
       socket.current.send(command);
     } else {
@@ -116,7 +116,7 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
       try {
         if(actuator.userData.getStatus() == 'clicked'){
           if(actuator.userData.getAdresse() != null){
-            console.log('Sending command to server:', actuator.userData.getAdresse());
+         //   console.log('Sending command to server:', actuator.userData.getAdresse());
             await launchModel(actuator.userData.getAdresse());
           }
         }

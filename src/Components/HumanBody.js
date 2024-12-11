@@ -8,7 +8,7 @@ const Torso = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
     // Front Torso Actuators (Positions relative to the Torso)
-    { id: 1, position: [0, -0.2, 0.2], adresse: 0, channel : 0 },
+    { id: 1, position: [0, -0.2, 0.2]},
     { id: 2, position: [0.25, -0.3, 0.2] },
     { id: 3, position: [-0.25, -0.3, 0.2] },
     { id: 4, position: [0.2, 0.1, 0.2] },
@@ -35,9 +35,14 @@ const Torso = forwardRef((props, ref) => {
 const RightArm = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 21, position: [0.1, 0.4, 0], adresse: 2, channel : 0  },
-    { id: 22, position: [0.1, 0, 0] },
-    { id: 23, position: [0.1, -0.4, 0] },
+    { id: 21, position: [-0.1, -0.4, -0.1], adresse: 7, channel: 0},
+    { id: 22, position: [-0.1, -0.2, -0.1], adresse: 6, channel: 0},
+    { id: 23, position: [0.1, -0.4, 0.1], adresse: 3, channel: 0},
+    { id: 24, position: [0.1, -0.4, -0.1], adresse: 4, channel: 0},
+    { id: 25, position: [0.1, -0.2, 0.1] , adresse: 2, channel: 0},
+    { id: 26, position: [0.1, -0.2, -0.1] , adresse: 5, channel: 0},
+    { id: 27, position: [-0.1, -0.4, 0.1], adresse: 0, channel: 0},
+    { id: 28, position: [-0.1, -0.2, 0.1], adresse: 1, channel: 0 },
   ];
 
   return (
@@ -59,7 +64,7 @@ const RightArm = forwardRef((props, ref) => {
 const LeftArm = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 31, position: [-0.1, 0.4, 0], adresse: 3, channel : 0  },
+    { id: 31, position: [-0.1, 0.4, 0]},
     { id: 32, position: [-0.1, 0, 0] },
     { id: 33, position: [-0.1, -0.4, 0] },
   ];
@@ -98,7 +103,7 @@ const Neck = forwardRef((props, ref) => {
 const Head = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 51, position: [0, 0.3, 0], adresse: 4, channel : 0},
+    { id: 51, position: [0, 0.3, 0]},
     { id: 52, position: [0.2, 0.25, 0.1] },
     { id: 53, position: [-0.2, 0.25, 0.1] },
   ];

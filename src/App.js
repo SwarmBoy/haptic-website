@@ -10,6 +10,7 @@ import CombinedChart from './Components/CombinedChart';
 import FileUploader from './Components/FileUploader';
 
 import HapticsTest from './Components/HapticsTest';
+import ActuatorChart from './Components/ActuatorChart';
 
 // Create a context with default values
 export const PlaneContext = createContext({
@@ -58,24 +59,30 @@ function App() {
         .catch((error) => console.error('Error fetching data:', error));
     };
 
-    const intervalId = setInterval(fetchData, 1000);
+    const intervalId = setInterval(fetchData, 100);
     return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
 
-  const addRemoveActuator = (adress, add) => {
+  const addRemoveActuator = (address, add) => {
     if (add) {
-      if (!actuatorsSelected.includes(adress)) {
-        setActuatorsSelected([...actuatorsSelected, adress]);
-      }
-    }
-    else {
-      setActuatorsSelected(actuatorsSelected.filter((actuator) => actuator !== adress));
+      setActuatorsSelected((prevState) => {
+        if (!prevState.includes(address)) {
+          return [...prevState, address];
+        }
+        return prevState;
+      });
+    } else {
+      console.log('Removing actuator:', address);
+      setActuatorsSelected((prevState) =>
+        prevState.filter((actuator) => actuator !== address)
+      );  
     }
   };
 
   useEffect(() => {
-    console.log(actuatorsSelected);
+    console.log('Actuators selected:', actuatorsSelected);
+
   }, [actuatorsSelected]);
 
   const handleFileLoaded = (jsonData) => {
@@ -108,66 +115,92 @@ function App() {
   };
 
   return (
-    <PlaneContext.Provider value={{ planeData, isPlaneMoving, bodyPartToActivate, launchModel, allActuators, setAllActuators, addRemoveActuator, dataActuators }}>
-      <div style={{ padding: '20px' , height: '80vh', display: 'flex', flexDirection: 'column' }}>
-        <div className='control' style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', margin: '20px' }}>
-          <div style={{ justifyContent: 'center', alignItems: 'center', marginRight: '50px' }}>
-            <h1>Haptic File Viewer</h1>
-            <FileUploader onFileLoaded={handleFileLoaded} onFileSupress={handleFileSupress} />
-            {showCombinedChart && (
-              <CombinedChart
-                amplitudeData={amplitudeData}
-                frequencyData={frequencyData}
-              />
-            )}
-          </div>
-          <div style={{ justifyContent: 'center', alignItems: 'center', marginLeft: '50px' }}>
-            <InputControls
-              theta={theta}
-              setTheta={setTheta}
-              phi={phi}
-              setPhi={setPhi}
-              speed={speed}
-              setSpeed={setSpeed}
-              isPlaneMoving={isPlaneMoving}
-              setIsPlaneMoving={setIsPlaneMoving}
-              triggerBodyPartAnimation={triggerBodyPartAnimation}
-            />
-          </div>
-          <div style={{ justifyContent: 'center', alignItems: 'center', marginLeft: '50px' }}>
-            <h2> Launch the animation </h2>
-            <button onClick={() => setIsPlaneMoving(true)}>Launch</button>
+    <div style={{ flexDirection: 'row', display: 'flex', height: '100vh' }}>
+        <div className='controlPanel' style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'flex-start', 
+              alignItems: 'center', 
+              margin: '20px', 
+              width: '70%', 
+              position: 'sticky', 
+              top: 0, 
+              zIndex: 10,
+              background: '#fff'
+            }}>   
+      <PlaneContext.Provider value={{ planeData, isPlaneMoving, bodyPartToActivate, launchModel, allActuators, setAllActuators, addRemoveActuator, dataActuators }}>
+          <div style={{ padding: '20px' , height: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div className='control' style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', margin: '20px' }}>
+              <div style={{ justifyContent: 'center', alignItems: 'center', marginRight: '50px' }}>
+                <h1>Haptic File Viewer</h1>
+                <FileUploader onFileLoaded={handleFileLoaded} onFileSupress={handleFileSupress} />
+                {showCombinedChart && (
+                  <CombinedChart
+                    amplitudeData={amplitudeData}
+                    frequencyData={frequencyData}
+                  />
+                )}
+              </div>
+              <div style={{ justifyContent: 'center', alignItems: 'center', marginLeft: '50px' }}>
+                <InputControls
+                  theta={theta}
+                  setTheta={setTheta}
+                  phi={phi}
+                  setPhi={setPhi}
+                  speed={speed}
+                  setSpeed={setSpeed}
+                  isPlaneMoving={isPlaneMoving}
+                  setIsPlaneMoving={setIsPlaneMoving}
+                  triggerBodyPartAnimation={triggerBodyPartAnimation}
+                />
+              </div>
+              <div style={{ justifyContent: 'center', alignItems: 'center', marginLeft: '50px' }}>
+                <h2> Launch the animation </h2>
+                <button onClick={() => setIsPlaneMoving(true)}>Launch</button>
 
 
-            <HapticsTest
-              amplitudeData={amplitudeData}
-              frequencyData={frequencyData}
-              setLaunchModel={setLaunchModel} // Pass the setter function
-            />
+                <HapticsTest
+                  amplitudeData={amplitudeData}
+                  frequencyData={frequencyData}
+                  setLaunchModel={setLaunchModel} // Pass the setter function
+                />
 
-            
+                
+              </div>
           </div>
-      </div>
-      <div style={{ flex: 1 }}>
-          <Canvas
-            camera={{ position: [0, 2, 8], fov: 50 }}
-            style={{ width: '100%', height: '100%' }}
-          >
-            <ambientLight intensity={1} />
-            <HumanBody setActuator = {setAllActuators} />
-            <MovingPlane
-              theta={theta}
-              phi={phi}
-              speed={speed}
-              isPlaneMoving={isPlaneMoving}
-              setPlaneData={setPlaneData}
-              setPlanMoving={setIsPlaneMoving}
-            />
-            <OrbitControls />
-          </Canvas>
-      </div>
+          <div style={{ flex: 1 }}>
+              <Canvas
+                camera={{ position: [0, 2, 8], fov: 50 }}
+                style={{ width: '100%', height: '100%' }}
+              >
+                <ambientLight intensity={1} />
+                <HumanBody setActuator = {setAllActuators} />
+                <MovingPlane
+                  theta={theta}
+                  phi={phi}
+                  speed={speed}
+                  isPlaneMoving={isPlaneMoving}
+                  setPlaneData={setPlaneData}
+                  setPlanMoving={setIsPlaneMoving}
+                />
+                <OrbitControls />
+              </Canvas>
+          </div>
+        </div>
+      </PlaneContext.Provider>
     </div>
-  </PlaneContext.Provider>
+    <div className='graphs' style={{ display: 'flex', flexDirection:'column', alignItems: 'center', margin: '20px', width: '30%' }}>
+      {actuatorsSelected.map(actuatorAddr => {
+        const actuatorData = dataActuators['commands'].filter(d => d['addr'] === actuatorAddr);
+      return (
+        <div key={actuatorAddr} style={{ marginBottom: '20px', width: '100%', height:'200px' }}>
+          <ActuatorChart actuatorAddr={actuatorAddr} actuatorData={actuatorData} />
+        </div>
+      );
+  })}
+    </div>
+
+  </div>
   );
 }
 

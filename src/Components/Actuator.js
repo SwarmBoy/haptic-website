@@ -108,13 +108,16 @@ const Actuator = (props, ref) => {
     } else if (status === 'clicked') {
       // Set color to red immediately
       materialRef.current.color.set('red');
+      planeData.addRemoveActuator(adresse, true);
+      console.log('Sending command to server:', adresse, true);
       // Optionally, you can start an animation from red to green
       
     } else if (status === 'idle') {
       // Reset color to grey
+      planeData.addRemoveActuator(adresse, false);
       materialRef.current.color.set('grey');
       if (adresse!=null && channel!=null) {
-        console.log('Sending command to server:', adresse, channel);
+        console.log('Sending command to server:', adresse, false);
         // Send the command to the server
         materialRef.current.color.set('pink');
       }
@@ -134,19 +137,10 @@ const Actuator = (props, ref) => {
     if (meshRef.current) {
       const actuatorWorldPosition = new THREE.Vector3();
       meshRef.current.getWorldPosition(actuatorWorldPosition);
-
-      const directionToCamera = new THREE.Vector3();
-      directionToCamera.subVectors(camera.position, actuatorWorldPosition).normalize();
-
-      const offsetDistance = 0.1; // Adjust this value as needed
-      const offsetPosition = new THREE.Vector3();
-      offsetPosition.copy(actuatorWorldPosition).addScaledVector(directionToCamera, offsetDistance);
-
-      return offsetPosition;
+      return actuatorWorldPosition;
     }
     return [0, 0, 0];
   };
-
 
   useEffect(() => {
     if (meshRef.current) {
@@ -176,16 +170,18 @@ const Actuator = (props, ref) => {
       >
         <div
           style={{
-            width: '200px',
-            height: '75px',
-            backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent background
-            padding: '5px',
-            borderRadius: '5px',
-            pointerEvents: 'auto',
-            
-          }}
-        >
-          <ActuatorPlot data={actuatorData} />
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '10px',
+            height: '10px',
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            border: '1px solid black',
+                                          }}>
+              <p style={{fontSize: '10px', color: 'black', padding: '5px'}}>
+                {adresse}
+              </p>
         </div>
       </Html>
     )}
@@ -193,4 +189,4 @@ const Actuator = (props, ref) => {
   );
 }
 
-export default forwardRef(Actuator); 
+export default forwardRef(Actuator);
