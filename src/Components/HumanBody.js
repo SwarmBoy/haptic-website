@@ -1,34 +1,54 @@
 import React, { useContext, useEffect, useRef, forwardRef } from 'react';
 import BodyPart from './BodyPart';
 import Actuator from './Actuator';
-import { Sphere } from '@react-three/drei';
+import { Cylinder, Sphere } from '@react-three/drei';
 import { PlaneContext } from '../App'; // Added import
+
+
+const getPositionOnEllipse = (height, angledeg) => {
+  const angle = (angledeg * Math.PI) / 180;
+const x = 1/4 * Math.cos(angle);
+  const y = 1/4 * Math.sin(angle);
+  return [x, height, y];
+};
+
+const torsoActuators = [];
+for (let i = 4; i <= 15; i++) {
+  torsoActuators.push({
+    id: i,
+    position: getPositionOnEllipse(0.2, (i - 4) * 30),
+    adresse: 13 + (i - 4),
+    channel: 0
+  });
+}
+
+for (let i = 16; i <= 27; i++) {
+  torsoActuators.push({
+    id: i,
+    position: getPositionOnEllipse(0, (i - 16) * 30),
+    adresse: 25 + (i - 16),
+    channel: 0
+  });
+}
+
+for (let i = 28; i <= 39; i++) {
+  torsoActuators.push({
+    id: i,
+    position: getPositionOnEllipse(-0.2, (i - 28) * 30),
+    adresse: 37 + (i - 28),
+    channel: 0
+  });
+}
 
 const Torso = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
-  const actuators = [
-    // Front Torso Actuators (Positions relative to the Torso)
-    { id: 1, position: [0, -0.2, 0.2]},
-    { id: 2, position: [0.25, -0.3, 0.2] },
-    { id: 3, position: [-0.25, -0.3, 0.2] },
-    { id: 4, position: [0.2, 0.1, 0.2] },
-    { id: 5, position: [-0.2, 0.1, 0.2] },
-    { id: 6, position: [0, 0.3, 0.2] },
-    // Back Torso Actuators
-    { id: 11, position: [0, -0.2, -0.2] },
-    { id: 12, position: [0.25, -0.3, -0.2] },
-    { id: 13, position: [-0.25, -0.3, -0.2] },
-    { id: 14, position: [0.2, 0.1, -0.2] },
-    { id: 15, position: [-0.2, 0.1, -0.2] },
-    { id: 16, position: [0, 0.3, -0.2] },
-  ];
-
   return (
-    <BodyPart ref={ref} position={[0, 0, 0]} args={[0.7, 1.5, 0.4]} color="lightblue">
-      {actuators.map((actuator, index) => (
-        <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
-        ))}
-    </BodyPart>
+    <Cylinder ref={ref} position={[0, 0, 0]} args={[0.25, 0.25, 1, 16]} scale={[2, 1, 1]} color="lightcoral">
+      <meshStandardMaterial attach="material" color="lightgreen" />
+      {torsoActuators.map((actuator, index) => (
+        <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} scale={[1/2,1,1]} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
+      ))}
+    </Cylinder>
   );
 });
 
@@ -172,7 +192,7 @@ function HumanBody({setActuator}) {
       }
     }
 
-  }, [bodyPartToActivate]);
+  }, []);
 
 
 

@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 
 import { Line } from 'react-chartjs-2';
-import 'chartjs-adapter-date-fns'; // Make sure to have this installed: npm install chartjs-adapter-date-fns
+import 'chartjs-adapter-date-fns'; 
 
 ChartJS.register(
   CategoryScale,

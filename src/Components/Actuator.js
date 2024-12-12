@@ -6,10 +6,11 @@ import { gsap } from 'gsap';
 import { PlaneContext } from '../App';
 import ActuatorPlot from './ActuatorPlot'; // Import the plot component
 import { deltaTime, pass } from 'three/webgpu';
+import { color } from 'chart.js/helpers';
 
 
 const Actuator = (props, ref) => {
-  const { position, adresse, channel } = props;
+  const { position, scale, adresse, channel } = props;
   const ANIMATION_DURATION = 0.35;
   const [status, setStatus] = useState('idle');
   const materialRef = useRef();
@@ -17,6 +18,7 @@ const Actuator = (props, ref) => {
   const planeData = useContext(PlaneContext);
   const [actuatorData, setActuatorData] = useState([]);
   const { camera } = useThree(); // Access the camera
+  const [actuatorAmplitude, setActuatorAmplitude] = useState(0);
 
   useFrame(() => {
     if (planeData && meshRef.current) {
@@ -35,7 +37,7 @@ const Actuator = (props, ref) => {
 
       // If the distance is less than or equal to the actuator's radius, they intersect
       const radius = 0.05; // Actuator sphere radius
-      if (Math.abs(distance) <= radius && status === 'idle') {  
+      if (Math.abs(distance) <= radius) {  
         setStatus('active');
             // Call the launchModel function from HapticsTest
         if  (adresse == null || channel == null) {
@@ -51,9 +53,6 @@ const Actuator = (props, ref) => {
   useEffect(() => {
     if (planeData && planeData.dataActuators && planeData.dataActuators.commands) {
       const data = planeData.dataActuators.commands.filter(cmd => cmd.addr === adresse);
-      // add a point for the current time  Date.now()/1000  `
-
-
       setActuatorData(data);
     }
   }, [planeData.dataActuators]);
@@ -74,6 +73,7 @@ const Actuator = (props, ref) => {
       }
     }
 
+    addToAllActuators();
 
   };
 
@@ -83,48 +83,46 @@ const Actuator = (props, ref) => {
     if (!allActuators.includes(meshRef.current)) {
       allActuators.push(meshRef.current);
       planeData.setAllActuators(allActuators);
-    }else{
-      console.log('Actuator already in the list');
     }
   };
 
 
   useEffect(() => {
-    if (status === 'active') {
-      // Start the animation from red to green
-      gsap.fromTo(
-        materialRef.current.color,
-        { r: 1, g: 0, b: 0 },
-        {
-          r: 0,
-          g: 1,
-          b: 0,
-          duration: ANIMATION_DURATION,
-          onComplete: () => {
-            setStatus('idle');
-          },
-        }
-      );
-    } else if (status === 'clicked') {
+    if (status === 'clicked') {
       // Set color to red immediately
       materialRef.current.color.set('red');
       planeData.addRemoveActuator(adresse, true);
-      console.log('Sending command to server:', adresse, true);
-      // Optionally, you can start an animation from red to green
       
     } else if (status === 'idle') {
       // Reset color to grey
       planeData.addRemoveActuator(adresse, false);
       materialRef.current.color.set('grey');
       if (adresse!=null && channel!=null) {
-        console.log('Sending command to server:', adresse, false);
         // Send the command to the server
         materialRef.current.color.set('pink');
       }
+      setStatus('data');
+    } else {
+      //create a color going fom grey to green grey is when the actuatorAmplitude is 0 and green when it is 10
+      if (actuatorAmplitude > 8) {
+          materialRef.current.color.set('red');
+      } else if (actuatorAmplitude > 6) {
+        materialRef.current.color.set('orange');
+      }else if (actuatorAmplitude > 4) {
+        materialRef.current.color.set('yellow');
+      } else if (actuatorAmplitude > 2) {
+        materialRef.current.color.set('green');
+      }     
+      else {
+        if (adresse!=null && channel!=null) {
+          //light grey
+          materialRef.current.color.set('lightgrey'); 
+        }else {
+          materialRef.current.color.set('grey');
+        }
+      }
     }
-
-    addToAllActuators();
-  }, [status]);
+  }, [status, actuatorAmplitude]);
 
   useEffect(() => {
     if (planeData.isPlaneMoving) {
@@ -150,14 +148,23 @@ const Actuator = (props, ref) => {
       meshRef.current.userData.getChannel = () => channel;
     }
   }, [status]);
-  // Expose setStatus method to parent components
-  React.useImperativeHandle(ref, () => ({
-    setStatus: (newStatus) => setStatus(newStatus),
-  }));
 
-  return (
+
+  useEffect(() => {
+    if (actuatorData.length > 0) {
+      const lastData = actuatorData[actuatorData.length - 1];
+      const duty = lastData.duty;
+      if (duty !== undefined) {
+        setActuatorAmplitude(duty);
+      }
+
+    }
+  }, [actuatorData]);
+
+
+  return ( 
     <mesh ref={meshRef} position={position} onClick={handleClick}>
-    <Sphere args={[0.05, 16, 16]}>
+    <Sphere args={[0.05, 16, 16]} scale={scale}>
       <meshStandardMaterial ref={materialRef} color="grey" />
     </Sphere>
     {status === 'clicked'  && (

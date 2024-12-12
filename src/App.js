@@ -59,7 +59,7 @@ function App() {
         .catch((error) => console.error('Error fetching data:', error));
     };
 
-    const intervalId = setInterval(fetchData, 100);
+    const intervalId = setInterval(fetchData, 50);
     return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
@@ -73,7 +73,6 @@ function App() {
         return prevState;
       });
     } else {
-      console.log('Removing actuator:', address);
       setActuatorsSelected((prevState) =>
         prevState.filter((actuator) => actuator !== address)
       );  
@@ -81,7 +80,6 @@ function App() {
   };
 
   useEffect(() => {
-    console.log('Actuators selected:', actuatorsSelected);
 
   }, [actuatorsSelected]);
 
