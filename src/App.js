@@ -61,6 +61,8 @@ function App() {
 
     const intervalId = setInterval(fetchData, 50);
     return () => clearInterval(intervalId); // Cleanup interval on unmount
+
+  
   }, []);
 
 

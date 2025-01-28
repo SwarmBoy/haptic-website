@@ -13,16 +13,16 @@ const x = 1/4 * Math.cos(angle);
 };
 
 const torsoActuators = [];
-for (let i = 4; i <= 15; i++) {
+for (let i = 0; i < 10; i++) {
   torsoActuators.push({
     id: i,
-    position: getPositionOnEllipse(0.2, (i - 4) * 30),
-    adresse: 13 + (i - 4),
+    position: getPositionOnEllipse(-0.2, i * 31- 90),
+    adresse: i,
     channel: 0
   });
 }
 
-for (let i = 16; i <= 27; i++) {
+/*for (let i = 16; i <= 27; i++) {
   torsoActuators.push({
     id: i,
     position: getPositionOnEllipse(0, (i - 16) * 30),
@@ -40,6 +40,8 @@ for (let i = 28; i <= 39; i++) {
   });
 }
 
+*/
+
 const Torso = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   return (
@@ -52,26 +54,25 @@ const Torso = forwardRef((props, ref) => {
   );
 });
 
-const RightArm = forwardRef((props, ref) => {
+const LeftArm = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
+  
   const actuators = [
-    { id: 21, position: [-0.1, -0.4, -0.1], adresse: 7, channel: 0},
-    { id: 22, position: [-0.1, -0.2, -0.1], adresse: 6, channel: 0},
-    { id: 23, position: [0.1, -0.4, 0.1], adresse: 3, channel: 0},
-    { id: 24, position: [0.1, -0.4, -0.1], adresse: 4, channel: 0},
-    { id: 25, position: [0.1, -0.2, 0.1] , adresse: 2, channel: 0},
-    { id: 26, position: [0.1, -0.2, -0.1] , adresse: 5, channel: 0},
-    { id: 27, position: [-0.1, -0.4, 0.1], adresse: 0, channel: 0},
-    { id: 28, position: [-0.1, -0.2, 0.1], adresse: 1, channel: 0 },
+    { id: 90, position: [0, -0.4, -0.1], adresse: 95, channel: 0},
+    { id: 91, position: [0, -0.2, -0.1], adresse: 94, channel: 0},
+    { id: 92, position: [0, 0, -0.1], adresse: 93, channel: 0},
+    { id: 93, position: [0, 0.2, -0.1], adresse: 92, channel: 0},
+    { id: 94, position: [0, 0.4, -0.1], adresse: 91, channel: 0},
+    { id: 95, position: [0, 0.6, -0.1], adresse: 90, channel: 0},
   ];
 
   return (
     <BodyPart
       ref={ref}
-      position={[0.6, 0.3, 0]}
+      position={[0.4, 0.3, -0.4]}
       args={[0.2, 1, 0.2]}
       color="lightcoral"
-      rotation={[0, 0, 0.50]} // 10 degrees in radians
+      rotation={[1.3, 0, -0.3]} // 10 degrees in radians
     >
       {actuators.map((actuator, index) => (
         <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
@@ -81,20 +82,18 @@ const RightArm = forwardRef((props, ref) => {
   );
 });
 
-const LeftArm = forwardRef((props, ref) => {
+const RightArm = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
-    { id: 31, position: [-0.1, 0.4, 0]},
-    { id: 32, position: [-0.1, 0, 0] },
-    { id: 33, position: [-0.1, -0.4, 0] },
+
   ];
   return (
     <BodyPart
       ref={ref}
-      position={[-0.6, 0.3, 0]}
+      position={[-0.4, 0.3, -0.4]}
       args={[0.2, 1, 0.2]}
       color="lightcoral"
-      rotation={[0, 0, -0.5]} // -10 degrees in radians
+      rotation={[1.3, 0, 0.3]} // -10 degrees in radians
     >
       {actuators.map((actuator, index) => (
         <Actuator key={actuator.id} ref={el => actuatorRefs.current[index] = el} position={actuator.position} adresse={actuator.adresse!=null?actuator.adresse:null} channel={actuator.channel!=null?actuator.channel:null} />    
@@ -106,9 +105,10 @@ const LeftArm = forwardRef((props, ref) => {
 const Neck = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
+    /*
     { id: 41, position: [0, 0, -0.2]},
     { id: 42, position: [0.1, 0, -0.25] },
-    { id: 43, position: [-0.1, 0, -0.25] },
+    { id: 43, position: [-0.1, 0, -0.25] },*/
   ];
 
   return (
@@ -123,9 +123,10 @@ const Neck = forwardRef((props, ref) => {
 const Head = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
+    /*
     { id: 51, position: [0, 0.3, 0]},
     { id: 52, position: [0.2, 0.25, 0.1] },
-    { id: 53, position: [-0.2, 0.25, 0.1] },
+    { id: 53, position: [-0.2, 0.25, 0.1] },*/
   ];
 
   return (

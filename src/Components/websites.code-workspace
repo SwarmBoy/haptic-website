@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../../../UnityMIT/WebPages/unity-plotter"
+		},
+		{
+			"path": "../../../massage"
 		}
 	],
 	"settings": {}

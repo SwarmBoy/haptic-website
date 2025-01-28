@@ -6,9 +6,11 @@ import { all } from 'three/webgpu';
 function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuators }) {
   const REFRESH_RATE = 10; // ms
   const planeData = useContext(PlaneContext);
+  const actuatorsTest = [0,1,2,3,4,5,30,31,32,33,34,35, 60,61,62,63,64,65, 90,91,92,93,94,95, 96, 97, 98, 99];
 
 
   const socket = useRef(null);
+  const [adrrID, setActuatorsID] = useState(0);
   const [addr, setAddr] = useState(0);
   const [duty, setDuty] = useState(8);
   const [freq, setFreq] = useState(2);
@@ -106,8 +108,8 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
   };
 
   const stopAllCommand = () => {
-    for (let addr = 0; addr < 6; addr++) {
-      sendCommand(addr, 0, 0, 0);
+    for (let addr = 0; addr < 130; addr++) {
+        sendCommand(addr, 0, 0, 0);
     }
     };
 
@@ -140,9 +142,12 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
         <input
           type="range"
           min="0"
-          max="10"
-          value={addr}
-          onChange={(e) => setAddr(Number(e.target.value))}
+          max={actuatorsTest.length - 1}
+          value={adrrID}
+          onChange={(e) => {
+            setAddr(actuatorsTest[Number(e.target.value)]);
+            setActuatorsID(Number(e.target.value));
+          }}
         />
         <span>{addr}</span>
       </div>
@@ -162,7 +167,7 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
         <input
           type="range"
           min="0"
-          max="10"
+          max='10'
           value={freq}
           onChange={(e) => setFreq(Number(e.target.value))}
         />
