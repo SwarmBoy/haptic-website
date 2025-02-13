@@ -13,11 +13,22 @@ const x = 1/4 * Math.cos(angle);
 };
 
 const torsoActuators = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 12; i++) {
   torsoActuators.push({
-    id: i,
-    position: getPositionOnEllipse(-0.2, i * 31- 90),
-    adresse: i,
+    id: 60+i,
+    position: getPositionOnEllipse(0.2, i * (360/12) - 90),
+    adresse: 60+i,
+    channel: 0
+  });
+}
+
+
+const adresseObstacles = [1,3,4,6];
+for (let i = 0; i < 4; i++) {
+  torsoActuators.push({
+    id: adresseObstacles[i],
+    position: getPositionOnEllipse(-0.2, i * 90),
+    adresse: adresseObstacles[i],
     channel: 0
   });
 }
@@ -58,12 +69,15 @@ const LeftArm = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   
   const actuators = [
-    { id: 90, position: [0, -0.4, -0.1], adresse: 95, channel: 0},
-    { id: 91, position: [0, -0.2, -0.1], adresse: 94, channel: 0},
-    { id: 92, position: [0, 0, -0.1], adresse: 93, channel: 0},
-    { id: 93, position: [0, 0.2, -0.1], adresse: 92, channel: 0},
-    { id: 94, position: [0, 0.4, -0.1], adresse: 91, channel: 0},
-    { id: 95, position: [0, 0.6, -0.1], adresse: 90, channel: 0},
+    { id: 98, position: [0, -0.3, -0.1], adresse: 98, channel: 0},
+    { id: 97, position: [0, -0.2, -0.1], adresse: 97, channel: 0},
+    { id: 96, position: [0, -0.1, -0.1], adresse: 96, channel: 0},
+    { id: 95, position: [0, 0, -0.1], adresse: 95, channel: 0},
+    { id: 94, position: [0, 0.1, -0.1], adresse: 94, channel: 0},
+    { id: 93, position: [0, 0.2, -0.1], adresse: 93, channel: 0},
+    { id: 92, position: [0, 0.3, -0.1], adresse: 92, channel: 0},
+    { id: 91, position: [0, 0.4, -0.1], adresse: 91, channel: 0},
+    { id: 90, position: [0, 0.5, -0.1], adresse: 90, channel: 0},
   ];
 
   return (
@@ -85,7 +99,15 @@ const LeftArm = forwardRef((props, ref) => {
 const RightArm = forwardRef((props, ref) => {
   const actuatorRefs = useRef([]);
   const actuators = [
-
+    { id: 128, position: [0, -0.3, -0.1], adresse: 128, channel: 0},
+    { id: 127, position: [0, -0.2, -0.1], adresse: 127, channel: 0},
+    { id: 126, position: [0, -0.1, -0.1], adresse: 126, channel: 0},
+    { id: 125, position: [0, 0, -0.1], adresse: 125, channel: 0},
+    { id: 124, position: [0, 0.1, -0.1], adresse: 124, channel: 0},
+    { id: 123, position: [0, 0.2, -0.1], adresse: 123, channel: 0},
+    { id: 122, position: [0, 0.3, -0.1], adresse: 122, channel: 0},
+    { id: 121, position: [0, 0.4, -0.1], adresse: 121, channel: 0},
+    { id: 120, position: [0, 0.5, -0.1], adresse: 120, channel: 0},
   ];
   return (
     <BodyPart

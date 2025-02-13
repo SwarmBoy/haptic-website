@@ -6,7 +6,7 @@ import { all } from 'three/webgpu';
 function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuators }) {
   const REFRESH_RATE = 10; // ms
   const planeData = useContext(PlaneContext);
-  const actuatorsTest = [0,1,2,3,4,5,30,31,32,33,34,35, 60,61,62,63,64,65, 90,91,92,93,94,95, 96, 97, 98, 99];
+  const actuatorsTest = [0,1,2,3,4,5,6,7,8,30,31,32,33,34,35, 60,61,62,63,64,65, 90,91,92,93,94,95, 96, 97, 98, 99, 121, 122, 123];
 
 
   const socket = useRef(null);
@@ -78,7 +78,7 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
 
   const launchOnAndOff = async (adresse, mode, duty, freq) => {
     sendCommand(adresse, mode, duty, freq);
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 300));
     sendCommand(adresse, 0, 0, 0);
   };
 
@@ -108,7 +108,7 @@ function HapticsTest({ amplitudeData, frequencyData, setLaunchModel, allActuator
   };
 
   const stopAllCommand = () => {
-    for (let addr = 0; addr < 130; addr++) {
+    for (let addr = 0; addr < 190; addr++) {
         sendCommand(addr, 0, 0, 0);
     }
     };
